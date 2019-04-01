@@ -1,17 +1,1 @@
-<div align="center">
-  <h1>Base</h1>
-  <h2 (click)="goToSecret()">Secret</h2>
-
-  <div *ngIf="authService.user$ | async as user; else login">
-    <pre>{{user | json}}</pre>
-    <hr>
-    <button class="button" (click)="authService.googleSignOut()">Sign Out</button>
-  </div>
-
-
-  <ng-template #login>
-    <button class="button" (click)="authService.googleSignin()">Login with Google</button>
-  </ng-template>
-
-  <router-outlet></router-outlet>
-</div>
+<router-outlet></router-outlet>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { User } from './user.model';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 // import { AngularFireStorage } from '@angular/fire/storage';
 import { Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
@@ -32,23 +32,16 @@ export class AuthService {
   async googleSignin() {
     const provider = new auth.GoogleAuthProvider();
     const credential = await this.angularFireAuth.auth.signInWithPopup(provider);
-    return this.updateUserData(credential.user);
+    this.updateUserData(credential.user);
   }
 
   async googleSignOut() {
     await this.angularFireAuth.auth.signOut();
-    return this.router.navigate(['/']);
+    return this.router.navigate(['login']);
   }
 
-  updateUserData({ uid, email, displayName, photoURL }: User) {
-    const userRef: AngularFirestoreDocument<User> = this.angularFirestore.doc(`users/${uid}`);
-    const data = {
-      uid,
-      email,
-      displayName,
-      photoURL
-    };
-
-    return userRef.set(data, { merge: true });
+  updateUserData({ email }: User) {
+    this.angularFirestore.collection('registered', ref => ref.where('email', '==', email)).valueChanges()
+      .subscribe(v => v.length ? this.router.navigate(['/']) : this.router.navigate(['login']));
   }
 }

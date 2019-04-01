@@ -9,13 +9,13 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
-import { SuperSecretComponent } from './super-secret/super-secret.component';
+import { LoginComponent } from './login/login.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SuperSecretComponent
+    LoginComponent
   ],
   imports: [
     BrowserModule,
