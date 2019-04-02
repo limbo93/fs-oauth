@@ -1,2 +1,15 @@
-<p>app main</p>
-<button class="button" (click)="authService.googleSignOut()">Sign Out</button>
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <span>CLUB</span>
+        <span class="spacer-right"></span>
+        <img mat-card-avatar src={{user.photoURL}}>
+        <h4 style="margin: 0 3px 0 3px">{{user.displayName}}</h4>
+        <button mat-flat-button color="secondary" (click)="authService.googleSignOut()">Sign Out</button>
+    </mat-toolbar-row>
+</mat-toolbar>
+
+<mat-card class="example-card" *ngIf="user">
+    <mat-card-content style="font-size: 3.75rem; text-align: center;">
+        Welcome {{user.displayName}}
+    </mat-card-content>
+</mat-card>

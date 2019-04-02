@@ -7,6 +7,7 @@ import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection 
 import { Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { auth } from 'firebase/app';
+import { NotificationService } from '../common/notification/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AuthService {
 
   constructor(private angularFireAuth: AngularFireAuth,
     private angularFirestore: AngularFirestore,
-    private router: Router) {
+    private router: Router, private notificationService: NotificationService) {
     this.user$ = this.angularFireAuth.authState.pipe(
       switchMap(user => {
         if (user) {
@@ -32,6 +33,7 @@ export class AuthService {
   async googleSignin() {
     const provider = new auth.GoogleAuthProvider();
     const credential = await this.angularFireAuth.auth.signInWithPopup(provider);
+    this.authorization(credential.user);
     this.updateUserData(credential.user);
   }
 
@@ -40,8 +42,28 @@ export class AuthService {
     return this.router.navigate(['login']);
   }
 
-  updateUserData({ email }: User) {
+  updateUserData({ uid, email, displayName, photoURL }: User) {
+    const userRef: AngularFirestoreDocument<User> = this.angularFirestore.doc(`users/${uid}`);
+    const data = {
+      uid,
+      email,
+      displayName,
+      photoURL
+    };
+
+    return userRef.set(data, { merge: true });
+  }
+
+  authorization({ email }: User) {
     this.angularFirestore.collection('registered', ref => ref.where('email', '==', email)).valueChanges()
-      .subscribe(v => v.length ? this.router.navigate(['/']) : this.router.navigate(['login']));
+      .subscribe(v => {
+        if (v.length) {
+          this.router.navigate(['/'])
+        } else {
+          this.googleSignOut();
+          this.notificationService.showWarningMessage('You are not authorized to access here.')
+          this.router.navigate(['login']);
+        }
+      });
   }
 }
